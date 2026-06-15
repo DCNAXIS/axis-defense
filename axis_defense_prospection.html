@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Axis Défense Prospection V1</title>
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--bg:#0f172a;--panel:#111c33;--card:#17233c;--muted:#94a3b8;--txt:#e5e7eb;--line:#2b3957;--accent:#38bdf8;--ok:#22c55e;--warn:#f59e0b;--bad:#ef4444;--violet:#a78bfa}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;background:#0b1220;color:var(--txt)}
+header{padding:22px 28px;background:linear-gradient(135deg,#0f172a,#1e293b);border-bottom:1px solid var(--line)}
+h1{margin:0 0 6px;font-size:24px}.sub{color:var(--muted);font-size:14px;line-height:1.45}.wrap{padding:18px 22px;max-width:1500px;margin:auto}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{border:1px solid var(--line);background:#111827;color:var(--txt);padding:10px 13px;border-radius:10px;cursor:pointer}.tab.active{background:var(--accent);color:#082f49;border-color:var(--accent);font-weight:700}
+.section{display:none}.section.active{display:block}.grid{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:12px;margin-bottom:16px}.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:left;color:var(--txt)}button.kpi{background:var(--panel);color:var(--txt);width:100%}button.kpi:hover{border-color:var(--accent)}.kpi .n{font-size:28px;font-weight:800}.kpi .l{color:var(--muted);font-size:13px;margin-top:5px}
+.controls{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:10px;margin:12px 0}.controls input,.controls select,textarea{width:100%;background:#0b1220;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px}button{background:var(--accent);color:#082f49;border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}.btn2{background:#25324d;color:var(--txt);border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:14px;overflow:hidden}th,td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top;font-size:13px}th{background:#16213a;text-align:left;color:#cbd5e1;position:sticky;top:0;z-index:1}tr:hover{background:#1b2945}.pill{display:inline-block;padding:3px 8px;border-radius:999px;font-weight:700;font-size:12px}.A{background:#064e3b;color:#a7f3d0}.B{background:#713f12;color:#fde68a}.C{background:#3b0764;color:#e9d5ff}.D{background:#450a0a;color:#fecaca}.score{font-weight:800;color:#7dd3fc}.small{font-size:12px;color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;line-height:1.45}.card h3{margin:0 0 8px;font-size:16px}.row{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:8px 0}.row:first-of-type{border-top:0}#map{height:620px;border-radius:14px;border:1px solid var(--line)}.cols{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.kanban{background:#101a2f;border:1px solid var(--line);border-radius:14px;padding:10px;min-height:360px}.kanban h3{font-size:14px;color:#cbd5e1}.item{background:#17233c;border:1px solid var(--line);border-radius:10px;padding:9px;margin:8px 0}.src a{color:#7dd3fc}.note{background:#111827;border-left:4px solid var(--accent);padding:12px 14px;border-radius:8px;margin:12px 0;color:#dbeafe}@media(max-width:900px){.grid,.cards,.cols{grid-template-columns:1fr}.controls{grid-template-columns:1fr}table{display:block;overflow:auto}}
+</style>
+</head>
+<body>
+<header><h1>Axis Défense Prospection V1</h1><div class="sub">Base opérationnelle de suspects et prospects Défense pour une PME d’assemblage électronique. Données publiques préremplies, scoring indicatif, notes modifiables localement dans le navigateur.</div></header>
+<div class="wrap">
+<div class="tabs"><button class="tab active" onclick="show('dashboard')">Tableau de bord</button><button class="tab" onclick="show('prospects')">Prospects</button><button class="tab" onclick="show('eurosatory')">Eurosatory</button><button class="tab" onclick="show('mapsec')">Carte</button><button class="tab" onclick="show('strategy')">Stratégie</button><button class="tab" onclick="show('sources')">Sources</button><button class="tab" onclick="show('sync')">Données</button></div>
+<section id="dashboard" class="section active"><div class="note">Lecture exigeante : cette base est une V1. Les présences Eurosatory et les stands ne sont indiqués que lorsqu’ils sont confirmés publiquement. Les liens “grand compte Défense” sont des hypothèses de prospection à qualifier, pas des relations commerciales garanties.</div><div class="grid" id="kpis"></div><div class="cards" id="topcards"></div></section>
+<section id="prospects" class="section"><div class="controls"><input id="q" placeholder="Recherche société, activité, région, mot-clé" oninput="clearSpecialAndRender()"><select id="prio" onchange="clearSpecialAndRender()"><option value="">Toutes priorités</option><option>A</option><option>B</option><option>C</option><option>D</option></select><select id="cat" onchange="clearSpecialAndRender()"><option value="">Toutes catégories</option></select><select id="stat" onchange="clearSpecialAndRender()"><option value="">Tous statuts</option><option>Suspect</option><option>Prospect</option><option>Contact établi</option><option>NDA signé</option><option>Consultation</option><option>Commande</option></select><button onclick="exportCSV()">Exporter CSV</button></div><div id="filterinfo" class="small"></div><div id="table"></div></section>
+<section id="eurosatory" class="section"><div class="note">Objectif terrain : 12 à 15 rencontres maximum. Priorité aux sociétés confirmées au salon ou fortement cohérentes avec les pôles électronique embarquée, optronique, drones, robotique, cybersécurité et systèmes critiques.</div><div id="eurotable"></div></section>
+<section id="mapsec" class="section"><div id="map"></div></section>
+<section id="strategy" class="section"><div class="cards"><div class="card"><h3>Positionnement Axis</h3><p>PME industrielle française, ISO 9001, démarche ISO 27001, assemblage électronique, sous-ensembles, industrialisation, tests, réactivité et confidentialité.</p></div><div class="card"><h3>Prospects les plus réalistes</h3><p>Intégrateurs systèmes et PME équipementières qui ont besoin d’électronique mais dont le cœur métier n’est pas l’assemblage de cartes.</p></div><div class="card"><h3>Point de vigilance</h3><p>Les EMS Défense déjà équipés en CMS peuvent être concurrents autant que prospects. À approcher plutôt pour surcharge capacitaire, seconde source ou sécurisation supply chain.</p></div></div><div class="note"><strong>Message d’approche conseillé</strong><br>Axis est une PME industrielle française spécialisée dans l’assemblage électronique et les sous-ensembles techniques. Nous souhaitons intégrer progressivement la supply chain Défense avec une approche fiable, discrète et long terme. Nous pouvons intervenir en fabrication, industrialisation, reprise de dossiers, petites et moyennes séries, tests et sécurisation capacitaire.</div></section>
+<section id="sync" class="section"><div id="sync-content"></div></section>
+<section id="sources" class="section"><div class="card src"><h3>Sources publiques utilisées pour cadrer la V1</h3><p>Eurosatory, annuaire exposants et présentation salon : <a href="https://www.eurosatory.com/en/" target="_blank">eurosatory.com</a></p><p>GICAT, annuaire et présentation : <a href="https://gicat.com/annuaire/" target="_blank">gicat.com/annuaire</a></p><p>Ministère des Armées, BITD : <a href="https://www.defense.gouv.fr/economie-guerre-produire-plus-plus-vite-defi/infographie-zoom-base-industrielle-technologique-defense" target="_blank">defense.gouv.fr</a></p><p>Exail Eurosatory 2026 : <a href="https://www.exail.com/events/eurosatory" target="_blank">exail.com</a></p><p>Bertin Eurosatory 2026 : <a href="https://www.bertin-technologies.fr/eurosatory-2026-bertin-technologies/" target="_blank">bertin-technologies.fr</a></p><p>Lacroix, Bertin, MC2, communiqué S-KAPS : <a href="https://www.lacroix-defense.com/news.php?code=eurosatory2026&langue=en" target="_blank">lacroix-defense.com</a></p><p>Exosens Eurosatory 2026 : <a href="https://cdn.photonis.com/fr/node/456575" target="_blank">exosens.com</a></p><p>ECRIN Systems Eurosatory 2026 : <a href="https://ecrin.com/guides-et-actualites/eurosatory-2026-ecrin-systems-stand-j356-ia-defense-securite" target="_blank">ecrin.com</a></p><p>ACTIA Aerospace, systèmes critiques : <a href="https://www.actia.com/en/actia-aerospace-electronics-at-the-heart-of-critical-systems-from-earth-to-space/" target="_blank">actia.com</a></p></div></section>
+</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const STORAGE_KEY="axis_defense_v1";
+const SYNC_KEY="axis_defense_sync_config";
+const DEFAULT_GIST_ID="559e544bd1b898994ac0cd96e91ce5a3";
+const SYNC_FILE="axis-defense-sync.json";
+
+const data = [
+{name:'Exail',cat:'Robotique, navigation, systèmes embarqués',region:'Île-de-France / Bretagne',city:'Saint-Germain-en-Laye',lat:48.898,lng:2.094,size:'ETI',axis:'cartes, sous-ensembles, test, industrialisation',gc:'Forces armées, naval, terrestre, drones',prio:'A',def:5,elec:5,hum:3,dist:3,out:4,euro:'Confirmé, Hall 6 stand H61',source:'https://www.exail.com/events/eurosatory',status:'Prospect',note:''},
+{name:'Bertin Technologies',cat:'Détection, capteurs, optronique, CBRN',region:'Île-de-France',city:'Montigny-le-Bretonneux',lat:48.77,lng:2.03,size:'ETI',axis:'cartes électroniques, capteurs, intégration',gc:'Lacroix, MC2, programmes Défense',prio:'A',def:5,elec:5,hum:3,dist:3,out:4,euro:'Confirmé, Hall 6 stand E83',source:'https://www.bertin-technologies.fr/eurosatory-2026-bertin-technologies/',status:'Prospect',note:''},
+{name:'MC2 Technologies',cat:'Guerre électronique, anti-drone, RF',region:'Hauts-de-France',city:'Lille',lat:50.63,lng:3.06,size:'PME',axis:'sous-ensembles RF, cartes, prototypes, séries',gc:'Lacroix, Bertin, anti-drone',prio:'A',def:5,elec:5,hum:5,dist:2,out:4,euro:'Présence via communiqué S-KAPS à qualifier',source:'https://www.lacroix-defense.com/news.php?code=eurosatory2026&langue=en',status:'Prospect',note:''},
+{name:'Lacroix Defense',cat:'Protection véhicules, leurres, anti-drone',region:'Bretagne',city:'Vern-sur-Seiche',lat:48.045,lng:-1.60,size:'ETI',axis:'électronique embarquée, câblage, sous-ensembles',gc:'Véhicules blindés, programmes terrestres',prio:'A',def:5,elec:4,hum:3,dist:5,out:3,euro:'Confirmé via communiqué 2026',source:'https://www.lacroix-defense.com/news.php?code=eurosatory2026&langue=en',status:'Prospect',note:''},
+{name:'ECRIN Systems',cat:'Calculateurs durcis, systèmes embarqués',region:'Île-de-France',city:'Les Ulis',lat:48.68,lng:2.17,size:'PME',axis:'fabrication cartes, intégration, test',gc:'Défense, sécurité, systèmes critiques',prio:'A',def:5,elec:5,hum:5,dist:3,out:3,euro:'Confirmé, Hall 5A stand J356',source:'https://ecrin.com/guides-et-actualites/eurosatory-2026-ecrin-systems-stand-j356-ia-defense-securite',status:'Prospect',note:''},
+{name:'Exosens',cat:'Vision nocturne, infrarouge, photonique',region:'Nouvelle-Aquitaine',city:'Mérignac',lat:44.84,lng:-0.65,size:'ETI',axis:'cartes capteurs, sous-ensembles, industrialisation',gc:'Optronique Défense',prio:'A',def:5,elec:5,hum:3,dist:2,out:3,euro:'Confirmé Eurosatory 2026',source:'https://cdn.photonis.com/fr/node/456575',status:'Prospect',note:''},
+{name:'CILAS',cat:'Lasers, optronique, désignation',region:'Centre-Val de Loire',city:'Orléans',lat:47.90,lng:1.91,size:'ETI',axis:'électronique de pilotage, sous-ensembles',gc:'Safran, ArianeGroup, Défense',prio:'A',def:5,elec:4,hum:3,dist:4,out:3,euro:'Confirmé Eurosatory 2026',source:'https://www.cilas.com/events/eurosatory-2026',status:'Suspect',note:''},
+{name:'Delair',cat:'Drones professionnels et défense',region:'Occitanie',city:'Toulouse',lat:43.60,lng:1.44,size:'PME',axis:'cartes embarquées, capteurs, maintenance',gc:'Observation, renseignement, défense',prio:'A',def:4,elec:5,hum:5,dist:2,out:4,euro:'À vérifier 2026',source:'https://delair.aero',status:'Suspect',note:''},
+{name:'EOS Technologie',cat:'Drones tactiques',region:'Nouvelle-Aquitaine',city:'Mérignac',lat:44.84,lng:-0.65,size:'PME',axis:'électronique drones, intégration, tests',gc:'Forces, sécurité, surveillance',prio:'A',def:4,elec:5,hum:5,dist:2,out:4,euro:'À vérifier',source:'https://eos-technologie.com',status:'Suspect',note:''},
+{name:'Cailabs',cat:'Photonique, communications optiques',region:'Bretagne',city:'Rennes',lat:48.12,lng:-1.68,size:'PME',axis:'sous-ensembles électroniques, test',gc:'Aérospatial, défense, communications',prio:'A',def:4,elec:4,hum:5,dist:5,out:3,euro:'À vérifier',source:'https://www.cailabs.com',status:'Suspect',note:''},
+{name:'Unseenlabs',cat:'Surveillance maritime par satellite',region:'Bretagne',city:'Rennes',lat:48.12,lng:-1.68,size:'PME',axis:'électronique sol, bancs, sous-ensembles',gc:'Défense maritime, spatial',prio:'A',def:4,elec:4,hum:5,dist:5,out:3,euro:'Confirmé Hall 5A, stand à compléter',source:'https://unseenlabs.com/fr/evenements/',status:'Suspect',note:''},
+{name:'ACTIA Aerospace',cat:'EMS et systèmes électroniques critiques',region:'Occitanie / Bretagne',city:'Toulouse',lat:43.60,lng:1.44,size:'ETI',axis:'surcharge capacitaire, seconde source EMS',gc:'Airbus, aéronautique, spatial, défense',prio:'B',def:4,elec:5,hum:2,dist:2,out:2,euro:'À vérifier',source:'https://www.actia.com/en/actia-aerospace-electronics-at-the-heart-of-critical-systems-from-earth-to-space/',status:'Suspect',note:''},
+{name:'SERMA Technologies',cat:'Expertise électronique, qualification, cybersécurité',region:'Nouvelle-Aquitaine',city:'Pessac',lat:44.81,lng:-0.63,size:'ETI',axis:'qualification, test, sous-traitance spécialisée',gc:'Aéronautique, spatial, défense',prio:'B',def:4,elec:5,hum:3,dist:2,out:2,euro:'À vérifier',source:'https://www.serma.com',status:'Suspect',note:''},
+{name:'Selha Group',cat:'EMS électronique industrielle',region:'Pays de la Loire',city:'Renazé',lat:47.79,lng:-1.05,size:'ETI',axis:'partenaire ou concurrent EMS, surcharge',gc:'Aéronautique, défense, énergie',prio:'B',def:3,elec:5,hum:3,dist:5,out:2,euro:'À vérifier',source:'https://www.selha-group.com',status:'Suspect',note:''},
+{name:'Lacroix Electronics',cat:'EMS électronique',region:'Pays de la Loire',city:'Saint-Herblain',lat:47.22,lng:-1.65,size:'ETI',axis:'surcharge, coopération capacitaire, benchmark',gc:'Industriel, aéronautique, défense à qualifier',prio:'B',def:3,elec:5,hum:2,dist:5,out:2,euro:'À vérifier',source:'https://www.lacroix-electronics.com',status:'Suspect',note:''},
+{name:'Eolane',cat:'EMS et électronique industrielle',region:'Pays de la Loire',city:'Angers',lat:47.47,lng:-0.55,size:'ETI',axis:'concurrent ou partenaire capacitaire',gc:'Industrie, médical, défense à qualifier',prio:'B',def:3,elec:5,hum:2,dist:5,out:2,euro:'À vérifier',source:'https://www.eolane.com',status:'Suspect',note:''},
+{name:'Elno',cat:'Communications militaires, audio, casques',region:'Île-de-France',city:'Argenteuil',lat:48.95,lng:2.25,size:'PME',axis:'cartes, câblage, audio durci',gc:'Forces, véhicules, communications',prio:'A',def:5,elec:4,hum:5,dist:3,out:3,euro:'À vérifier',source:'https://www.elno.fr',status:'Suspect',note:''},
+{name:'HGH Infrared Systems',cat:'Caméras infrarouges panoramiques',region:'Île-de-France',city:'Igny',lat:48.74,lng:2.22,size:'PME',axis:'cartes capteurs, intégration, test',gc:'Surveillance, défense, sécurité',prio:'A',def:4,elec:5,hum:5,dist:3,out:3,euro:'À vérifier',source:'https://www.hgh-infrared.com',status:'Suspect',note:''},
+{name:'Metravib Defence',cat:'Détection acoustique, localisation tirs',region:'Auvergne-Rhône-Alpes',city:'Limonest',lat:45.84,lng:4.77,size:'PME/ETI',axis:'cartes, capteurs, intégration',gc:'Véhicules, forces terrestres',prio:'A',def:5,elec:4,hum:4,dist:2,out:3,euro:'À vérifier',source:'https://www.metravib-defence.com',status:'Suspect',note:''},
+{name:'Atermes',cat:'Optronique, équipements embarqués',region:'Île-de-France',city:'Montigny-le-Bretonneux',lat:48.77,lng:2.03,size:'PME',axis:'cartes, sous-ensembles, industrialisation',gc:'Défense terrestre, optronique',prio:'A',def:5,elec:4,hum:5,dist:3,out:3,euro:'À vérifier',source:'https://www.atermes.fr',status:'Suspect',note:''},
+{name:'Sillinger',cat:'Embarcations militaires et sécurité',region:'Bretagne',city:'Merlevenez',lat:47.74,lng:-3.23,size:'PME',axis:'électronique embarquée, coffrets, câblage',gc:'Marine, forces spéciales, sécurité',prio:'B',def:4,elec:3,hum:5,dist:4,out:3,euro:'À vérifier',source:'https://www.sillinger.com',status:'Suspect',note:''},
+{name:'Nexvision',cat:'Caméras, vision, optronique',region:'Provence-Alpes-Côte d’Azur',city:'Aix-en-Provence',lat:43.53,lng:5.45,size:'PME',axis:'cartes caméra, sous-ensembles optoélectroniques',gc:'Défense, spatial, industriel',prio:'A',def:4,elec:5,hum:5,dist:1,out:3,euro:'À vérifier',source:'https://www.nexvision.fr',status:'Suspect',note:''},
+{name:'Novadem',cat:'Drones militaires et sécurité',region:'Provence-Alpes-Côte d’Azur',city:'Aix-en-Provence',lat:43.53,lng:5.45,size:'PME',axis:'cartes drones, maintenance, tests',gc:'Armée de Terre, sécurité',prio:'A',def:5,elec:5,hum:5,dist:1,out:3,euro:'À vérifier',source:'https://www.novadem.com',status:'Suspect',note:''},
+{name:'Flying Whales',cat:'Dirigeables lourds, logistique',region:'Île-de-France',city:'Suresnes',lat:48.87,lng:2.23,size:'PME/ETI',axis:'électronique embarquée, bancs, sous-ensembles',gc:'Logistique duale, défense à qualifier',prio:'C',def:2,elec:4,hum:4,dist:3,out:3,euro:'À vérifier',source:'https://www.flying-whales.com',status:'Suspect',note:''},
+{name:'YellowScan',cat:'LiDAR drones',region:'Occitanie',city:'Saint-Clément-de-Rivière',lat:43.68,lng:3.85,size:'PME',axis:'électronique capteurs, intégration',gc:'Cartographie, drones, défense duale',prio:'B',def:3,elec:5,hum:5,dist:2,out:3,euro:'Partenaires présents Eurosatory 2026',source:'https://www.yellowscan.com/events/eurosatory-paris-2026/',status:'Suspect',note:''},
+{name:'Arquus',cat:'Véhicules militaires',region:'Île-de-France / France',city:'Versailles',lat:48.80,lng:2.13,size:'Grand groupe/ETI',axis:'rang 2 via sous-ensembles, câblage, cartes',gc:'Armée française, Scorpion',prio:'B',def:5,elec:4,hum:1,dist:3,out:3,euro:'Confirmé communication 2026',source:'https://www.arquus-defense.com',status:'Suspect',note:''},
+{name:'John Cockerill Defense France',cat:'Tourelles et systèmes d’armes',region:'France / Belgique',city:'Commercy',lat:48.76,lng:5.59,size:'ETI',axis:'électronique embarquée, sous-ensembles',gc:'Véhicules blindés, armement',prio:'B',def:5,elec:4,hum:3,dist:2,out:3,euro:'À vérifier',source:'https://johncockerill.com/en/defense/',status:'Suspect',note:''},
+{name:'CNIM Systèmes Industriels',cat:'Systèmes complexes, franchissement, naval',region:'Provence-Alpes-Côte d’Azur',city:'La Seyne-sur-Mer',lat:43.10,lng:5.88,size:'ETI',axis:'coffrets, cartes, intégration',gc:'Défense, naval, systèmes industriels',prio:'B',def:4,elec:3,hum:3,dist:1,out:3,euro:'À vérifier',source:'https://www.cnim-systemes-industriels.com',status:'Suspect',note:''},
+{name:'Aresia',cat:'Équipements aéronautiques et défense',region:'Île-de-France',city:'Valenton',lat:48.75,lng:2.46,size:'ETI',axis:'sous-ensembles électroniques, câblage',gc:'Aéronautique militaire',prio:'B',def:4,elec:3,hum:3,dist:3,out:3,euro:'À vérifier',source:'https://www.aresia.com',status:'Suspect',note:''},
+{name:'Nicomatic',cat:'Connectique haute fiabilité',region:'Auvergne-Rhône-Alpes',city:'Bons-en-Chablais',lat:46.27,lng:6.37,size:'ETI',axis:'client ou partenaire connectique',gc:'Aéronautique, défense, spatial',prio:'B',def:4,elec:4,hum:3,dist:1,out:2,euro:'À vérifier',source:'https://www.nicomatic.com',status:'Suspect',note:''},
+{name:'Radiall',cat:'Connecteurs RF et hyperfréquences',region:'Île-de-France',city:'Aubervilliers',lat:48.91,lng:2.38,size:'ETI',axis:'partenariat composants, cartes RF',gc:'Aéronautique, défense, spatial',prio:'C',def:4,elec:4,hum:2,dist:3,out:1,euro:'À vérifier',source:'https://www.radiall.com',status:'Suspect',note:''},
+{name:'Souriau Sunbank by Eaton',cat:'Connectique sévérisée',region:'Pays de la Loire',city:'Champagné',lat:48.02,lng:0.33,size:'ETI/groupe',axis:'fournisseur, co-développement, relation locale',gc:'Aéronautique, défense, spatial',prio:'B',def:4,elec:3,hum:2,dist:5,out:1,euro:'À vérifier',source:'https://www.eaton.com',status:'Suspect',note:''},
+{name:'Scalian',cat:'Ingénierie systèmes et défense',region:'Occitanie',city:'Toulouse',lat:43.60,lng:1.44,size:'ETI',axis:'partenariat industrialisation, projets',gc:'Aéronautique, défense, spatial',prio:'C',def:3,elec:3,hum:2,dist:2,out:2,euro:'À vérifier',source:'https://www.scalian.com',status:'Suspect',note:''},
+{name:'Sogeclair Aerospace',cat:'Ingénierie aéronautique et défense',region:'Occitanie',city:'Blagnac',lat:43.64,lng:1.39,size:'ETI',axis:'sous-ensembles, industrialisation',gc:'Aéronautique, défense',prio:'C',def:3,elec:3,hum:2,dist:2,out:2,euro:'À vérifier',source:'https://www.sogeclair.com',status:'Suspect',note:''},
+{name:'Vistory',cat:'Impression 3D sécurisée, supply chain Défense',region:'Île-de-France',city:'Paris',lat:48.86,lng:2.35,size:'PME',axis:'partenariat innovation, traçabilité',gc:'Défense, maintenance',prio:'C',def:4,elec:2,hum:5,dist:3,out:2,euro:'À vérifier',source:'https://www.vistory.com',status:'Suspect',note:''},
+{name:'Arkeocean',cat:'Drones navals',region:'Bretagne',city:'Lorient',lat:47.75,lng:-3.36,size:'PME',axis:'cartes drones, industrialisation, tests',gc:'Défense navale, surveillance',prio:'A',def:4,elec:5,hum:5,dist:4,out:4,euro:'À vérifier',source:'https://www.frstrategie.org/publications/defense-et-industries/new-defence-politique-industrielle-defense-europe-2026',status:'Suspect',note:''},
+{name:'MUSTHANE',cat:'Solutions terrain, mobilité, défense',region:'Hauts-de-France',city:'Willems',lat:50.63,lng:3.24,size:'PME',axis:'électronique embarquée accessoires à qualifier',gc:'Forces, terrain, logistique',prio:'C',def:4,elec:2,hum:5,dist:2,out:2,euro:'À vérifier',source:'https://www.musthane.com',status:'Suspect',note:''},
+{name:'A-NSE',cat:'Aérostats, surveillance, ballons captifs',region:'Provence-Alpes-Côte d’Azur',city:'Signes',lat:43.29,lng:5.86,size:'PME',axis:'électronique embarquée, capteurs, énergie',gc:'Surveillance, sécurité, défense',prio:'B',def:4,elec:4,hum:5,dist:1,out:3,euro:'À vérifier',source:'https://www.a-nse.com',status:'Suspect',note:''},
+{name:'Sunbirds',cat:'Drones longue endurance',region:'Occitanie',city:'Toulouse',lat:43.60,lng:1.44,size:'PME',axis:'cartes drones, énergie, bancs',gc:'Surveillance, défense duale',prio:'B',def:3,elec:5,hum:5,dist:2,out:4,euro:'À vérifier',source:'https://sunbirds.aero',status:'Suspect',note:''},
+{name:'Hemeria',cat:'Nanosatellites, spatial',region:'Occitanie',city:'Toulouse',lat:43.60,lng:1.44,size:'ETI',axis:'cartes, bancs, sous-ensembles sol',gc:'Spatial Défense, CNES, programmes souverains',prio:'B',def:4,elec:5,hum:3,dist:2,out:3,euro:'À vérifier',source:'https://www.hemeria-group.com',status:'Suspect',note:''},
+{name:'Anywaves',cat:'Antennes satellites',region:'Occitanie',city:'Toulouse',lat:43.60,lng:1.44,size:'PME',axis:'électronique RF, test, petites séries',gc:'New Space, défense duale',prio:'B',def:3,elec:5,hum:5,dist:2,out:3,euro:'À vérifier',source:'https://anywaves.com',status:'Suspect',note:''},
+{name:'Greenerwave',cat:'Antennes reconfigurables, RF',region:'Île-de-France',city:'Paris',lat:48.86,lng:2.35,size:'PME',axis:'cartes RF, industrialisation, tests',gc:'Satcom, défense duale',prio:'B',def:3,elec:5,hum:5,dist:3,out:3,euro:'À vérifier',source:'https://greenerwave.com',status:'Suspect',note:''},
+{name:'Turgis & Gaillard',cat:'Aéronautique, drones, systèmes',region:'Normandie',city:'Caen',lat:49.18,lng:-0.37,size:'ETI',axis:'sous-ensembles électroniques, industrialisation',gc:'Défense aéronautique, drones',prio:'A',def:5,elec:4,hum:3,dist:4,out:3,euro:'À vérifier',source:'https://www.turgisetgaillard.fr',status:'Suspect',note:''},
+{name:'Mise à jour à compléter',cat:'Prospect ajouté manuellement',region:'',city:'',lat:46.8,lng:2.3,size:'',axis:'',gc:'',prio:'D',def:0,elec:0,hum:0,dist:0,out:0,euro:'',source:'',status:'Suspect',note:'Ligne modèle à remplacer'}
+];
+function score(x){return x.def*25+x.elec*25+x.hum*15+x.dist*10+x.out*25}
+function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');}
+
+// State : notes, statuts, stands modifiés par l'utilisateur
+let state=loadState();
+
+// Token passé via #ghp_xxx dans l'URL → sauvegarde + nettoyage
+(function(){
+  const hash=location.hash.replace(/^#/,'').trim();
+  const cfg=getSyncConfig();
+  if(hash.startsWith('ghp_')||hash.startsWith('github_pat_')){cfg.token=hash;history.replaceState(null,'',location.pathname+location.search);}
+  if(!cfg.gistId)cfg.gistId=DEFAULT_GIST_ID;
+  saveSyncConfig(cfg);
+})();
+
+function loadState(){try{const s=JSON.parse(localStorage.getItem(STORAGE_KEY));if(s)return s;}catch{}return{edits:{}};}
+function saveState(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state));}
+function getSyncConfig(){try{return JSON.parse(localStorage.getItem(SYNC_KEY))||{};}catch{return{};}}
+function saveSyncConfig(cfg){localStorage.setItem(SYNC_KEY,JSON.stringify(cfg));}
+function getEdit(name){return state.edits[name]||{};}
+function setEdit(name,field,value){state.edits[name]=state.edits[name]||{};state.edits[name][field]=value;saveState();}
+function prospect(base){return{...base,...getEdit(base.name)};}
+
+async function syncPush(){
+  const cfg=getSyncConfig();
+  if(!cfg.token||!cfg.gistId){alert("Configure d'abord le token GitHub dans l'onglet Données.");return;}
+  if(!confirm("Envoyer vers le cloud va écraser la version cloud par tes données actuelles.\n\nSi l'autre appareil a des modifications non récupérées, elles seront perdues.\n\nContinuer ?"))return;
+  const btn=document.getElementById('sync-push');
+  if(btn)btn.disabled=true,btn.textContent='Envoi…';
+  try{
+    const payload={...state,_syncedAt:new Date().toISOString()};
+    const res=await fetch(`https://api.github.com/gists/${cfg.gistId}`,{method:'PATCH',headers:{'Authorization':`token ${cfg.token}`,'Content-Type':'application/json'},body:JSON.stringify({files:{[SYNC_FILE]:{content:JSON.stringify(payload)}}})});
+    if(!res.ok)throw new Error(res.status);
+    saveSyncConfig({...cfg,lastPush:new Date().toISOString()});
+    if(btn)btn.textContent='✓ Envoyé !';
+    setTimeout(()=>{if(btn)btn.disabled=false,btn.textContent='⬆ Envoyer vers le cloud';renderSync();},2500);
+  }catch(e){alert('Erreur d\'envoi : '+e.message);if(btn)btn.disabled=false,btn.textContent='⬆ Envoyer vers le cloud';}
+}
+
+async function syncPull(){
+  const cfg=getSyncConfig();
+  if(!cfg.token||!cfg.gistId){alert("Configure d'abord le token GitHub dans l'onglet Données.");return;}
+  if(!confirm("Récupérer depuis le cloud va remplacer TOUTES tes modifications locales.\n\nTes données non envoyées seront définitivement perdues.\n\nContinuer ?"))return;
+  const btn=document.getElementById('sync-pull');
+  if(btn)btn.disabled=true,btn.textContent='Récupération…';
+  try{
+    const res=await fetch(`https://api.github.com/gists/${cfg.gistId}`,{headers:{'Authorization':`token ${cfg.token}`}});
+    if(!res.ok)throw new Error(res.status);
+    const json=await res.json();
+    const content=json.files[SYNC_FILE]?.content;
+    if(!content)throw new Error('Fichier introuvable dans le Gist');
+    const parsed=JSON.parse(content);
+    delete parsed._syncedAt;
+    state={edits:{},...parsed};
+    saveState();
+    renderKpis();renderTable();renderEuro();
+    if(btn)btn.textContent='✓ Récupéré !';
+    setTimeout(()=>{if(btn)btn.disabled=false,btn.textContent='⬇ Récupérer depuis le cloud';renderSync();},2500);
+  }catch(e){alert('Erreur de récupération : '+e.message);if(btn)btn.disabled=false,btn.textContent='⬇ Récupérer depuis le cloud';}
+}
+
+function saveCloudConfig(){
+  const token=document.getElementById('cfg-token').value.trim();
+  const gistId=document.getElementById('cfg-gistid').value.trim();
+  saveSyncConfig({...getSyncConfig(),token,gistId});
+  alert('Configuration enregistrée !');
+}
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='axis-defense-sauvegarde.json';a.click();URL.revokeObjectURL(a.href);
+}
+
+function importJSON(file){
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const parsed=JSON.parse(reader.result);
+      if(parsed.edits){state=parsed;saveState();renderKpis();renderTable();renderEuro();alert('Données importées.');}
+      else throw new Error();
+    }catch{alert('Fichier non reconnu.');}
+  };
+  reader.readAsText(file);
+}
+
+function renderSync(){
+  const cfg=getSyncConfig();
+  const lastPush=cfg.lastPush?new Date(cfg.lastPush).toLocaleString('fr-FR'):null;
+  const lastPull=cfg.lastPull?new Date(cfg.lastPull).toLocaleString('fr-FR'):null;
+  const root=document.getElementById('sync-content');
+  if(!root)return;
+  root.innerHTML=`
+    <div style="background:#111c33;border:1px solid #2b3957;border-radius:14px;padding:24px;max-width:700px;margin:0 auto">
+      <h2 style="margin:0 0 8px">Synchronisation cloud</h2>
+      <p style="color:#94a3b8;margin:0 0 16px">Tes notes et statuts sont <strong>sauvegardés automatiquement</strong> sur cet appareil à chaque modification. La synchro cloud sert à partager entre PC et téléphone.</p>
+      <div style="background:#0b1220;border-radius:10px;padding:16px;margin-bottom:16px;line-height:1.7">
+        <div style="margin-bottom:12px">
+          <strong>⬆ Envoyer vers le cloud</strong> — envoie tes modifications vers le cloud.<br>
+          <span style="color:#94a3b8;font-size:13px">⚠ Écrase la version cloud. À faire quand TU viens de modifier des choses.</span>
+          ${lastPush?`<br><span style="color:#94a3b8;font-size:13px">Dernier envoi : ${lastPush}</span>`:''}
+        </div>
+        <div>
+          <strong>⬇ Récupérer depuis le cloud</strong> — remplace tes données locales par celles du cloud.<br>
+          <span style="color:#94a3b8;font-size:13px">⚠ Écrase tes données locales. À faire quand l'autre appareil vient d'envoyer.</span>
+          ${lastPull?`<br><span style="color:#94a3b8;font-size:13px">Dernière récupération : ${lastPull}</span>`:''}
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+        <button id="sync-push" onclick="syncPush()">⬆ Envoyer vers le cloud</button>
+        <button id="sync-pull" onclick="syncPull()" class="btn2">⬇ Récupérer depuis le cloud</button>
+      </div>
+      <hr style="border:none;border-top:1px solid #2b3957;margin:0 0 20px">
+      <h3 style="margin:0 0 8px">Sauvegarde locale</h3>
+      <p style="color:#94a3b8;font-size:13px;margin:0 0 12px">Exporte un fichier JSON de secours ou importe une sauvegarde précédente. Seules tes modifications sont exportées, pas les données de base.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+        <button onclick="exportJSON()" class="btn2">⬇ Exporter mes modifications (JSON)</button>
+        <label class="btn2" style="border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;display:inline-block">⬆ Importer un JSON<input type="file" accept="application/json" style="display:none" onchange="if(this.files[0])importJSON(this.files[0])"></label>
+        <button onclick="exportCSV()" class="btn2">⬇ Exporter tous les prospects (CSV)</button>
+      </div>
+      <hr style="border:none;border-top:1px solid #2b3957;margin:0 0 20px">
+      <details>
+        <summary style="cursor:pointer;color:#94a3b8">Paramètres avancés (token GitHub)</summary>
+        <div style="margin-top:12px;display:grid;gap:10px;max-width:420px">
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:13px">Token GitHub<input id="cfg-token" type="password" placeholder="ghp_xxxxxxxxxxxx" value="${esc(cfg.token||'')}" style="background:#0b1220;color:#e5e7eb;border:1px solid #2b3957;border-radius:8px;padding:8px"></label>
+          <label style="display:flex;flex-direction:column;gap:6px;font-size:13px">ID du Gist<input id="cfg-gistid" placeholder="${DEFAULT_GIST_ID}" value="${esc(cfg.gistId||'')}" style="background:#0b1220;color:#e5e7eb;border:1px solid #2b3957;border-radius:8px;padding:8px"></label>
+          <button onclick="saveCloudConfig()" class="btn2" style="width:fit-content">Enregistrer</button>
+        </div>
+      </details>
+    </div>`;
+}
+
+let specialFilter='';
+
+function filtered(){
+  const q=document.getElementById('q')?.value.toLowerCase()||'',p=document.getElementById('prio')?.value||'',c=document.getElementById('cat')?.value||'',s=document.getElementById('stat')?.value||'';
+  return data.map(prospect).filter(x=>(!q||Object.values(x).join(' ').toLowerCase().includes(q))&&(!p||x.prio==p)&&(!c||x.cat==c)&&(!s||x.status==s)&&(!specialFilter||matchSpecial(x))).sort((a,b)=>score(b)-score(a));
+}
+function matchSpecial(x){if(specialFilter==='confirmed')return x.euro&&!x.euro.includes('À vérifier');if(specialFilter==='human')return x.size.includes('PME')||x.hum>=4;return true;}
+function clearSpecialAndRender(){specialFilter='';renderTable();}
+function applyDashboardFilter(kind){document.getElementById('q').value='';document.getElementById('cat').value='';document.getElementById('stat').value='';document.getElementById('prio').value='';specialFilter='';if(kind==='A')document.getElementById('prio').value='A';if(kind==='confirmed')specialFilter='confirmed';if(kind==='human')specialFilter='human';show('prospects');renderTable();}
+function show(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',(t.getAttribute('onclick')||'').includes(`show('${id}')`)));if(id==='mapsec')setTimeout(initMap,150);if(id==='sync')renderSync();}
+function renderKpis(){
+  const total=data.length,A=data.filter(x=>x.prio==='A').length,
+        euro=data.map(prospect).filter(x=>x.euro&&!x.euro.includes('À vérifier')).length,
+        pme=data.filter(x=>x.size.includes('PME')||x.hum>=4).length;
+  const kpis=[['Prospects V1',total,'all'],['Priorité A',A,'A'],['Présence salon confirmée',euro,'confirmed'],['PME ou taille humaine',pme,'human']];
+  document.getElementById('kpis').innerHTML=kpis.map(k=>`<button class="kpi" onclick="applyDashboardFilter('${k[2]}')"><div class=n>${k[1]}</div><div class=l>${k[0]}</div></button>`).join('');
+  document.getElementById('topcards').innerHTML=filtered().slice(0,9).map(x=>card(x)).join('');
+}
+function card(x){return `<div class=card><h3>${esc(x.name)} <span class="pill ${x.prio}">${x.prio}</span></h3><div class=small>${esc(x.cat)} • ${esc(x.region)}</div><div class=row><span>Score</span><span class=score>${score(x)}</span></div><div class=row><span>Intérêt Axis</span><span>${esc(x.axis)}</span></div><div class=row><span>Eurosatory</span><span>${esc(x.euro)}</span></div></div>`;}
+function renderTable(){
+  const cats=[...new Set(data.map(x=>x.cat))].sort();
+  const catSel=document.getElementById('cat');
+  if(catSel&&catSel.options.length<2){cats.forEach(c=>catSel.insertAdjacentHTML('beforeend',`<option>${esc(c)}</option>`));}
+  const label=specialFilter==='confirmed'?'Filtre actif : présence salon confirmée':specialFilter==='human'?'Filtre actif : PME ou taille humaine':'';
+  const fi=document.getElementById('filterinfo');
+  if(fi)fi.innerHTML=label?label+' <button class="btn2" onclick="clearSpecialAndRender()">Réinitialiser</button>':'';
+  const statuts=['Suspect','Prospect','Contact établi','NDA signé','Consultation','Commande'];
+  const rows=filtered().map(x=>`<tr>
+    <td><b>${esc(x.name)}</b><br><span class=small>${esc(x.city)} • ${esc(x.region)}</span></td>
+    <td>${esc(x.cat)}<br><span class=small>${esc(x.size)}</span></td>
+    <td>${esc(x.axis)}</td>
+    <td>${esc(x.gc)}</td>
+    <td><span class="pill ${x.prio}">${x.prio}</span><br><span class=score>${score(x)}</span></td>
+    <td><textarea rows=2 onchange="setEdit('${esc(x.name)}','euro',this.value);renderEuro();renderKpis()">${esc(x.euro)}</textarea></td>
+    <td><select onchange="setEdit('${esc(x.name)}','status',this.value)">${statuts.map(s=>`<option${x.status===s?' selected':''}>${s}</option>`).join('')}</select></td>
+    <td><a style="color:#7dd3fc" href="${esc(x.source)}" target="_blank" rel="noopener">source</a></td>
+    <td><textarea rows=2 onchange="setEdit('${esc(x.name)}','note',this.value)">${esc(x.note)}</textarea></td>
+  </tr>`).join('');
+  document.getElementById('table').innerHTML=`<table><thead><tr><th>Société</th><th>Catégorie</th><th>Intérêt Axis</th><th>Grand compte Défense</th><th>Priorité</th><th>Eurosatory / stand</th><th>Statut</th><th>Source</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>`;
+  renderEuro();renderKpis();
+}
+function renderEuro(){
+  const rows=data.map(prospect).filter(x=>x.euro&&!x.euro.includes('À vérifier')).sort((a,b)=>score(b)-score(a)).map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.euro)}</td><td><span class="pill ${x.prio}">${x.prio}</span> ${score(x)}</td><td>${esc(x.axis)}</td><td>${esc(x.note)}</td></tr>`).join('');
+  document.getElementById('eurotable').innerHTML=`<table><thead><tr><th>Société</th><th>Stand ou présence</th><th>Priorité</th><th>Objectif de visite</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+let mapDone=false;
+function initMap(){
+  if(mapDone)return;mapDone=true;
+  const m=L.map('map').setView([47.4,1.2],6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'OpenStreetMap'}).addTo(m);
+  data.map(prospect).filter(x=>x.lat&&x.lng).forEach(x=>{L.marker([x.lat,x.lng]).addTo(m).bindPopup(`<b>${esc(x.name)}</b><br>${esc(x.cat)}<br>Priorité ${x.prio}, score ${score(x)}<br>${esc(x.axis)}`);});
+}
+function exportCSV(){
+  const cols=['name','cat','region','city','size','axis','gc','prio','score','euro','source','status','note'];
+  const csv=[cols.join(';')].concat(data.map(prospect).map(x=>cols.map(c=>`"${String(c==='score'?score(x):x[c]||'').replaceAll('"','""')}"`).join(';'))).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='axis_defense_prospects.csv';a.click();
+}
+renderKpis();renderTable();renderEuro();
+</script>
+</body>
+</html>
