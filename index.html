@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Axis Défense Prospection V1</title>
+<title>Axis Défense Prospection V3</title>
 <link rel="preconnect" href="https://unpkg.com">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
@@ -14,16 +14,18 @@ h1{margin:0 0 6px;font-size:24px}.sub{color:var(--muted);font-size:14px;line-hei
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}.tab{border:1px solid var(--line);background:#111827;color:var(--txt);padding:10px 13px;border-radius:10px;cursor:pointer}.tab.active{background:var(--accent);color:#082f49;border-color:var(--accent);font-weight:700}
 .section{display:none}.section.active{display:block}.grid{display:grid;grid-template-columns:repeat(4,minmax(170px,1fr));gap:12px;margin-bottom:16px}.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:left;color:var(--txt)}button.kpi{background:var(--panel);color:var(--txt);width:100%}button.kpi:hover{border-color:var(--accent)}.kpi .n{font-size:28px;font-weight:800}.kpi .l{color:var(--muted);font-size:13px;margin-top:5px}
 .controls{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:10px;margin:12px 0}.controls input,.controls select,textarea{width:100%;background:#0b1220;color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:10px}button{background:var(--accent);color:#082f49;border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}.btn2{background:#25324d;color:var(--txt);border:1px solid var(--line)}
-table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:14px;overflow:hidden}th,td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top;font-size:13px}th{background:#16213a;text-align:left;color:#cbd5e1;position:sticky;top:0;z-index:1}tr:hover{background:#1b2945}.pill{display:inline-block;padding:3px 8px;border-radius:999px;font-weight:700;font-size:12px}.A{background:#064e3b;color:#a7f3d0}.B{background:#713f12;color:#fde68a}.C{background:#3b0764;color:#e9d5ff}.D{background:#450a0a;color:#fecaca}.score{font-weight:800;color:#7dd3fc}.small{font-size:12px;color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;line-height:1.45}.card h3{margin:0 0 8px;font-size:16px}.row{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:8px 0}.row:first-of-type{border-top:0}#map{height:620px;border-radius:14px;border:1px solid var(--line)}.cols{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.kanban{background:#101a2f;border:1px solid var(--line);border-radius:14px;padding:10px;min-height:360px}.kanban h3{font-size:14px;color:#cbd5e1}.item{background:#17233c;border:1px solid var(--line);border-radius:10px;padding:9px;margin:8px 0}.src a{color:#7dd3fc}.note{background:#111827;border-left:4px solid var(--accent);padding:12px 14px;border-radius:8px;margin:12px 0;color:#dbeafe}@media(max-width:900px){.grid,.cards,.cols{grid-template-columns:1fr}.controls{grid-template-columns:1fr}table{display:block;overflow:auto}}
+table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:14px;overflow:hidden}th,td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top;font-size:13px}th{background:#16213a;text-align:left;color:#cbd5e1;position:sticky;top:0;z-index:1}tr:hover{background:#1b2945}.pill{display:inline-block;padding:3px 8px;border-radius:999px;font-weight:700;font-size:12px}.A{background:#064e3b;color:#a7f3d0}.B{background:#713f12;color:#fde68a}.C{background:#3b0764;color:#e9d5ff}.D{background:#450a0a;color:#fecaca}.score{font-weight:800;color:#7dd3fc}.small{font-size:12px;color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;line-height:1.45}.card h3{margin:0 0 8px;font-size:16px}.row{display:flex;justify-content:space-between;gap:12px;border-top:1px solid var(--line);padding:8px 0}.row:first-of-type{border-top:0}#map{height:620px;border-radius:14px;border:1px solid var(--line)}.cols{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.kanban{background:#101a2f;border:1px solid var(--line);border-radius:14px;padding:10px;min-height:360px}.kanban h3{font-size:14px;color:#cbd5e1}.item{background:#17233c;border:1px solid var(--line);border-radius:10px;padding:9px;margin:8px 0}.src a{color:#7dd3fc}.note{background:#111827;border-left:4px solid var(--accent);padding:12px 14px;border-radius:8px;margin:12px 0;color:#dbeafe}.checkcell{text-align:center}.linkbtn{color:#7dd3fc;text-decoration:underline;cursor:pointer}.news-summary{max-width:520px}.visitedrow{opacity:.58}@media(max-width:900px){.grid,.cards,.cols{grid-template-columns:1fr}.controls{grid-template-columns:1fr}table{display:block;overflow:auto}}
 </style>
 </head>
 <body>
-<header><h1>Axis Défense Prospection V1</h1><div class="sub">Base opérationnelle de suspects et prospects Défense pour une PME d’assemblage électronique. Données publiques préremplies, scoring indicatif, notes modifiables localement dans le navigateur.</div></header>
+<header><h1>Axis Défense Prospection V3</h1><div class="sub">Base opérationnelle de suspects et prospects Défense pour une PME d’assemblage électronique. Données publiques préremplies, scoring indicatif, notes modifiables localement dans le navigateur.</div></header>
 <div class="wrap">
-<div class="tabs"><button class="tab active" onclick="show('dashboard')">Tableau de bord</button><button class="tab" onclick="show('prospects')">Prospects</button><button class="tab" onclick="show('eurosatory')">Eurosatory</button><button class="tab" onclick="show('mapsec')">Carte</button><button class="tab" onclick="show('strategy')">Stratégie</button><button class="tab" onclick="show('sources')">Sources</button><button class="tab" onclick="show('sync')">Sauvegarde</button></div>
+<div class="tabs"><button class="tab active" onclick="show('dashboard')">Tableau de bord</button><button class="tab" onclick="show('prospects')">Prospects</button><button class="tab" onclick="show('eurosatory')">Eurosatory</button><button class="tab" onclick="show('newssec')">Actualités prospects</button><button class="tab" onclick="show('mapsec')">Carte</button><button class="tab" onclick="show('strategy')">Stratégie</button><button class="tab" onclick="show('sources')">Sources</button><button class="tab" onclick="show('sync')">Sauvegarde</button></div>
 <section id="dashboard" class="section active"><div class="note">Lecture exigeante : cette base est une V1. Les présences Eurosatory et les stands ne sont indiqués que lorsqu’ils sont confirmés publiquement. Les liens “grand compte Défense” sont des hypothèses de prospection à qualifier, pas des relations commerciales garanties.</div><div class="grid" id="kpis"></div><div class="cards" id="topcards"></div></section>
-<section id="prospects" class="section"><div class="controls"><input id="q" placeholder="Recherche société, activité, région, mot-clé" oninput="clearSpecialAndRender()"><select id="prio" onchange="clearSpecialAndRender()"><option value="">Toutes priorités</option><option>A</option><option>B</option><option>C</option><option>D</option></select><select id="cat" onchange="clearSpecialAndRender()"><option value="">Toutes catégories</option></select><select id="stat" onchange="clearSpecialAndRender()"><option value="">Tous statuts</option><option>Suspect</option><option>Prospect</option><option>Contact établi</option><option>NDA signé</option><option>Consultation</option><option>Commande</option></select><button onclick="exportCSV()">Exporter CSV</button></div><div id="filterinfo" class="small"></div><div id="table"></div></section>
+<section id="prospects" class="section"><div class="controls"><input id="q" placeholder="Recherche société, activité, région, mot-clé" oninput="clearSpecialAndRender()"><select id="prio" onchange="clearSpecialAndRender()"><option value="">Toutes priorités</option><option>A</option><option>B</option><option>C</option><option>D</option></select><select id="cat" onchange="clearSpecialAndRender()"><option value="">Toutes catégories</option></select><select id="stat" onchange="clearSpecialAndRender()"><option value="">Tous statuts</option><option>Suspect</option><option>Prospect</option><option>Contact établi</option><option>NDA signé</option><option>Consultation</option><option>Commande</option></select><button onclick="exportCSV()">Exporter CSV</button></div><div class="note">Mode salon : cochez “Vu” après une visite. Le prospect disparaît de la liste active, mais reste conservé dans l’historique et réapparaît si vous activez “Afficher les vus”.</div><label class="small"><input type="checkbox" id="showVisited" onchange="renderTable()"> Afficher les prospects vus</label><div id="filterinfo" class="small"></div><div id="table"></div></section>
 <section id="eurosatory" class="section"><div class="note">Objectif terrain : 12 à 15 rencontres maximum. Priorité aux sociétés confirmées au salon ou fortement cohérentes avec les pôles électronique embarquée, optronique, drones, robotique, cybersécurité et systèmes critiques.</div><div id="eurotable"></div></section>
+
+<section id="newssec" class="section"><div class="note">Cet onglet donne des accroches factuelles pour préparer les rencontres. Il ne remplace pas une qualification commerciale : certaines informations concernent le marché ou un partenariat, pas nécessairement une relation directe avec Axis.</div><div class="controls"><input id="newsq" placeholder="Recherche société, thème, source" oninput="renderNews()"><select id="newstype" onchange="renderNews()"><option value="">Tous types</option><option>Financement</option><option>Croissance</option><option>Partenariat</option><option>Contrat</option><option>Marché</option><option>Gouvernance</option></select><button onclick="show('prospects')">Retour prospects</button><button class="btn2" onclick="exportNewsCSV()">Exporter actualités</button></div><div id="newstable"></div></section>
 <section id="mapsec" class="section"><div id="map"></div></section>
 <section id="strategy" class="section"><div class="cards"><div class="card"><h3>Positionnement Axis</h3><p>PME industrielle française, ISO 9001, démarche ISO 27001, assemblage électronique, sous-ensembles, industrialisation, tests, réactivité et confidentialité.</p></div><div class="card"><h3>Prospects les plus réalistes</h3><p>Intégrateurs systèmes et PME équipementières qui ont besoin d’électronique mais dont le cœur métier n’est pas l’assemblage de cartes.</p></div><div class="card"><h3>Point de vigilance</h3><p>Les EMS Défense déjà équipés en CMS peuvent être concurrents autant que prospects. À approcher plutôt pour surcharge capacitaire, seconde source ou sécurisation supply chain.</p></div></div><div class="note"><strong>Message d’approche conseillé</strong><br>Axis est une PME industrielle française spécialisée dans l’assemblage électronique et les sous-ensembles techniques. Nous souhaitons intégrer progressivement la supply chain Défense avec une approche fiable, discrète et long terme. Nous pouvons intervenir en fabrication, industrialisation, reprise de dossiers, petites et moyennes séries, tests et sécurisation capacitaire.</div></section>
 <section id="sync" class="section"><div id="sync-content"></div></section>
@@ -31,7 +33,7 @@ table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:
 </div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const STORAGE_KEY="axis_defense_v1";
+const STORAGE_KEY="axis_defense_v3";
 const SYNC_KEY="axis_defense_sync_config";
 const DEFAULT_GIST_ID="559e544bd1b898994ac0cd96e91ce5a3";
 const SYNC_FILE="axis-defense-sync.json";
@@ -81,11 +83,27 @@ const data = [
 {name:'Greenerwave',cat:'Antennes reconfigurables, RF',region:'Île-de-France',city:'Paris',lat:48.86,lng:2.35,size:'PME',axis:'cartes RF, industrialisation, tests',gc:'Satcom, défense duale',prio:'B',def:3,elec:5,hum:5,dist:3,out:3,euro:'À vérifier',source:'https://greenerwave.com',status:'Suspect',note:''},
 {name:'Turgis & Gaillard',cat:'Aéronautique, drones, systèmes',region:'Normandie',city:'Caen',lat:49.18,lng:-0.37,size:'ETI',axis:'sous-ensembles électroniques, industrialisation',gc:'Défense aéronautique, drones',prio:'A',def:5,elec:4,hum:3,dist:4,out:3,euro:'À vérifier',source:'https://www.turgisetgaillard.fr',status:'Suspect',note:''},
 {name:'Mise à jour à compléter',cat:'Prospect ajouté manuellement',region:'',city:'',lat:46.8,lng:2.3,size:'',axis:'',gc:'',prio:'D',def:0,elec:0,hum:0,dist:0,out:0,euro:'',source:'',status:'Suspect',note:'Ligne modèle à remplacer'}
-];
-function score(x){return x.def*25+x.elec*25+x.hum*15+x.dist*10+x.out*25}
-function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');}
 
-// State : notes, statuts, stands modifiés par l'utilisateur
+];
+const recentNews = [
+{company:'Exail',type:'Croissance',date:'18/03/2026',title:'Résultats 2025 et prises de commandes record',summary:'Exail annonce pour 2025 une forte dynamique commerciale, avec un carnet de commandes très élevé et une croissance portée par la navigation, la robotique maritime et les applications Défense. Accroche possible : montée en cadence et besoin de partenaires industriels fiables.',source:'Exail Technologies, 18 mars 2026',url:'https://www.actusnews.com/en/exail-technologies/pr/2026/03/18/2025-annual-results-strong-improvement-in-financial-earnings-and-cash-flows'},
+{company:'Exail',type:'Gouvernance',date:'12/06/2026',title:'Différend financier lié au refinancement post iXblue',summary:'Reuters signale un différend de valorisation avec ICG sur des instruments liés au financement de l’acquisition d’iXblue. À utiliser avec prudence : ce n’est pas une accroche commerciale positive, mais cela montre que vous suivez l’actualité du groupe.',source:'Reuters, 12 juin 2026',url:'https://www.reuters.com/business/exail-shares-tumble-clash-over-bond-valuation-could-lift-refinancing-costs-2026-06-12/'},
+{company:'Bertin Technologies',type:'Gouvernance',date:'02/12/2025',title:'Projet d’acquisition par Fremman Capital et Chequers Capital',summary:'Bertin Technologies annonce un accord de principe portant sur son acquisition par Fremman Capital et Chequers Capital. Accroche possible : phase de développement et consolidation autour des applications critiques.',source:'Bertin Technologies, 2 décembre 2025',url:'https://www.bertin-technologies.com/fremman-chequers-capital-put-option-agreement-to-acquire-bertin-technologies/'},
+{company:'Bertin Technologies',type:'Contrat',date:'2025',title:'Commande néerlandaise pour Bertin Exensor',summary:'Bertin Exensor indique une première commande importante, proche de 30 M€, pour la fourniture de systèmes Flexnet UUGS aux forces armées néerlandaises, avec livraisons prévues de 2025 à 2027. Accroche : capteurs terrain, fiabilité, production et support long terme.',source:'Bertin Exensor, archives actualités',url:'https://www.exensor.com/news/'},
+{company:'Lacroix Defense',type:'Partenariat',date:'09/06/2026',title:'S-KAPS avec Bertin et MC2 Technologies',summary:'Lacroix Defense, Bertin Technologies et MC2 Technologies présentent une configuration française de protection de véhicules blindés contre les drones. Accroche : coopération entre industriels français et intégration de briques électroniques critiques.',source:'Lacroix Defense, 9 juin 2026',url:'https://www.lacroix-defense.com/news.php?code=eurosatory2026&langue=en'},
+{company:'MC2 Technologies',type:'Partenariat',date:'09/06/2026',title:'Participation à la solution S-KAPS',summary:'MC2 Technologies apporte son expertise micro-ondes et RF dans une solution anti-drone française dévoilée avec Lacroix et Bertin. Accroche : guerre électronique, RF, industrialisation de systèmes anti-drones.',source:'Lacroix Defense, 9 juin 2026',url:'https://www.lacroix-defense.com/news.php?code=eurosatory2026&langue=en'},
+{company:'MC2 Technologies',type:'Marché',date:'10/03/2026',title:'Industrialisation française de la lutte anti-drone',summary:'Le Monde décrit une montée à l’échelle industrielle des dispositifs anti-drones en France et cite MC2 Technologies parmi les acteurs concernés. Accroche : la demande augmente, les chaînes industrielles doivent suivre.',source:'Le Monde, 10 mars 2026',url:'https://www.lemonde.fr/en/economy/article/2026/03/10/france-scales-up-anti-drone-measures-to-industrial-level-as-threat-rises_6751296_19.html'},
+{company:'Delair',type:'Croissance',date:'2026',title:'Ambition de doublement du chiffre d’affaires',summary:'SAFE Cluster rapporte que Delair aurait franchi 50 M€ de chiffre d’affaires en 2025 et viserait 100 M€ en 2026. À vérifier directement avec l’entreprise avant usage formel, mais utile comme signal de croissance.',source:'SAFE Cluster, 2026',url:'https://www.safecluster.com/actualites/delair-drone-volt-et-tethys-parmi-les-champions-francais-de-la-croissance/'},
+{company:'Delair',type:'Produit',date:'16/06/2025',title:'Présentation du drone DT61',summary:'Delair présente le DT61 au Salon du Bourget 2025, un drone d’observation longue distance à voilure fixe et décollage vertical. Accroche : nouveaux produits, payload, énergie, cartes embarquées, tests.',source:'Delair, 16 juin 2025',url:'https://delair.aero/category/news-and-updates-of-delair-and-drones/'},
+{company:'Cailabs',type:'Financement',date:'12/09/2025',title:'Financement de 57 M€ pour l’industrialisation',summary:'Cailabs obtient 57 M€ de financements, dont 37 M€ de la BEI et 20 M€ d’investisseurs dont Definvest et le Fonds Innovation Défense. Accroche : passage à l’échelle industrielle, capacités de production, applications spatial et Défense.',source:'Cailabs, 12 septembre 2025',url:'https://www.cailabs.com/news/aerospace-and-defense/cailabs-secures-e57-million-to-accelerate-growth-and-industrial-scale-up/'},
+{company:'Unseenlabs',type:'Croissance',date:'31/03/2026',title:'Lancement du 20e satellite',summary:'Unseenlabs annonce le lancement de BRO-19, vingtième satellite de sa constellation dédiée à la connaissance du domaine maritime par détection RF. Accroche : montée en capacité opérationnelle, RF, spatial, surveillance maritime.',source:'World Border Congress, 31 mars 2026',url:'https://world-border-congress.com/unseenlabs-announces-the-successful-launch-of-the-20th-satellite-of-its-constellation-dedicated-to-maritime-domain-awareness/'},
+{company:'Unseenlabs',type:'Financement',date:'27/02/2024',title:'Levée de fonds de 85 M€',summary:'Unseenlabs a levé 85 M€ pour renforcer sa constellation et ses services de renseignement RF maritime. L’information est antérieure à un an, donc à utiliser comme contexte de trajectoire, pas comme actualité immédiate.',source:'Unseenlabs, 27 février 2024',url:'https://unseenlabs.com/en/news/record-breaking-fundraising-of-85-million/'},
+{company:'EOS Technologie',type:'Produit',date:'19/06/2025',title:'Débat sur les zones d’essais drones longue distance',summary:'EOS Technologie relaie les enjeux de tests longue distance pour drones, sujet critique pour l’industrie française. Accroche : besoin d’essais, fiabilité embarquée, endurance et contraintes opérationnelles.',source:'EOS Technologie, 19 juin 2025',url:'https://www.eos-technologie.com/news/'},
+{company:'ECRIN Systems',type:'Salon',date:'2026',title:'Présence Eurosatory 2026 orientée IA, défense et sécurité',summary:'ECRIN Systems annonce sa présence à Eurosatory 2026 avec un positionnement autour de l’IA, de la défense et de la sécurité. Accroche : systèmes embarqués durcis, compute, intégration électronique.',source:'ECRIN Systems, 2026',url:'https://ecrin.com/guides-et-actualites/eurosatory-2026-ecrin-systems-stand-j356-ia-defense-securite'},
+{company:'ACTIA Aerospace',type:'Marché',date:'2025/2026',title:'Électronique au cœur des systèmes critiques',summary:'ACTIA Aerospace communique sur ses électroniques pour systèmes critiques, de la Terre à l’espace. Accroche : exigences qualité, traçabilité, industrialisation et sous-ensembles électroniques.',source:'ACTIA, page corporate',url:'https://www.actia.com/en/actia-aerospace-electronics-at-the-heart-of-critical-systems-from-earth-to-space/'},
+{company:'Exosens',type:'Salon',date:'2026',title:'Présence Eurosatory 2026',summary:'Exosens confirme sa présence à Eurosatory 2026. Accroche : vision nocturne, optronique, capteurs et chaîne de valeur électronique associée.',source:'Exosens, 2026',url:'https://www.exosens.com/events/eurosatory-2026'}
+];
+// State : notes, statuts, stands, "Vu" — sauvegardés automatiquement dans le navigateur
 let state=loadState();
 
 // Token passé via #ghp_xxx dans l'URL → sauvegarde + nettoyage
@@ -104,10 +122,14 @@ function saveSyncConfig(cfg){localStorage.setItem(SYNC_KEY,JSON.stringify(cfg));
 function getEdit(name){return state.edits[name]||{};}
 function setEdit(name,field,value){state.edits[name]=state.edits[name]||{};state.edits[name][field]=value;saveState();}
 function prospect(base){return{...base,...getEdit(base.name)};}
+function esc(v){return String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');}
+
+function isVisited(name){return !!getEdit(name).visited;}
+function setVisited(name,val){setEdit(name,'visited',!!val);renderTable();renderEuro();renderKpis();}
 
 async function syncPush(){
   const cfg=getSyncConfig();
-  if(!cfg.token||!cfg.gistId){alert("Configure d'abord le token GitHub dans l'onglet Données.");return;}
+  if(!cfg.token||!cfg.gistId){alert("Configure d'abord le token GitHub dans l'onglet Sauvegarde.");return;}
   if(!confirm("Envoyer vers le cloud va écraser la version cloud par tes données actuelles.\n\nSi l'autre appareil a des modifications non récupérées, elles seront perdues.\n\nContinuer ?"))return;
   const btn=document.getElementById('sync-push');
   if(btn)btn.disabled=true,btn.textContent='Envoi…';
@@ -123,7 +145,7 @@ async function syncPush(){
 
 async function syncPull(){
   const cfg=getSyncConfig();
-  if(!cfg.token||!cfg.gistId){alert("Configure d'abord le token GitHub dans l'onglet Données.");return;}
+  if(!cfg.token||!cfg.gistId){alert("Configure d'abord le token GitHub dans l'onglet Sauvegarde.");return;}
   if(!confirm("Récupérer depuis le cloud va remplacer TOUTES tes modifications locales.\n\nTes données non envoyées seront définitivement perdues.\n\nContinuer ?"))return;
   const btn=document.getElementById('sync-pull');
   if(btn)btn.disabled=true,btn.textContent='Récupération…';
@@ -176,7 +198,7 @@ function renderSync(){
   root.innerHTML=`
     <div style="background:#111c33;border:1px solid #2b3957;border-radius:14px;padding:24px;max-width:700px;margin:0 auto">
       <h2 style="margin:0 0 8px">Synchronisation cloud</h2>
-      <p style="color:#94a3b8;margin:0 0 16px">Tes notes et statuts sont <strong>sauvegardés automatiquement</strong> sur cet appareil à chaque modification. La synchro cloud sert à partager entre PC et téléphone.</p>
+      <p style="color:#94a3b8;margin:0 0 16px">Tes notes, statuts et cases "Vu" sont <strong>sauvegardés automatiquement</strong> sur cet appareil à chaque modification. La synchro cloud sert à partager entre PC et téléphone.</p>
       <div style="background:#0b1220;border-radius:10px;padding:16px;margin-bottom:16px;line-height:1.7">
         <div style="margin-bottom:12px">
           <strong>⬆ Envoyer vers le cloud</strong> — envoie tes modifications vers le cloud.<br>
@@ -195,11 +217,12 @@ function renderSync(){
       </div>
       <hr style="border:none;border-top:1px solid #2b3957;margin:0 0 20px">
       <h3 style="margin:0 0 8px">Sauvegarde locale</h3>
-      <p style="color:#94a3b8;font-size:13px;margin:0 0 12px">Exporte un fichier JSON de secours ou importe une sauvegarde précédente. Seules tes modifications sont exportées, pas les données de base.</p>
+      <p style="color:#94a3b8;font-size:13px;margin:0 0 12px">Exporte un fichier JSON de secours ou importe une sauvegarde précédente. Seules tes modifications sont exportées (notes, statuts, "Vu", stands), pas les données de base.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
         <button onclick="exportJSON()" class="btn2">⬇ Exporter mes modifications (JSON)</button>
         <label class="btn2" style="border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer;display:inline-block">⬆ Importer un JSON<input type="file" accept="application/json" style="display:none" onchange="if(this.files[0])importJSON(this.files[0])"></label>
-        <button onclick="exportCSV()" class="btn2">⬇ Exporter tous les prospects (CSV)</button>
+        <button onclick="exportCSV()" class="btn2">⬇ Exporter prospects (CSV)</button>
+        <button onclick="exportNewsCSV()" class="btn2">⬇ Exporter actualités (CSV)</button>
       </div>
       <hr style="border:none;border-top:1px solid #2b3957;margin:0 0 20px">
       <details>
@@ -213,25 +236,28 @@ function renderSync(){
     </div>`;
 }
 
+function score(x){return x.def*25+x.elec*25+x.hum*15+x.dist*10+x.out*25}
 let specialFilter='';
 
 function filtered(){
-  const q=document.getElementById('q')?.value.toLowerCase()||'',p=document.getElementById('prio')?.value||'',c=document.getElementById('cat')?.value||'',s=document.getElementById('stat')?.value||'';
-  return data.map(prospect).filter(x=>(!q||Object.values(x).join(' ').toLowerCase().includes(q))&&(!p||x.prio==p)&&(!c||x.cat==c)&&(!s||x.status==s)&&(!specialFilter||matchSpecial(x))).sort((a,b)=>score(b)-score(a));
+  const q=document.getElementById('q')?.value.toLowerCase()||'',p=document.getElementById('prio')?.value||'',c=document.getElementById('cat')?.value||'',s=document.getElementById('stat')?.value||'',showV=document.getElementById('showVisited')?.checked||false;
+  return data.map(prospect).filter(x=>(showV||!isVisited(x.name))&&(!q||Object.values(x).join(' ').toLowerCase().includes(q))&&(!p||x.prio==p)&&(!c||x.cat==c)&&(!s||x.status==s)&&(!specialFilter||matchSpecial(x))).sort((a,b)=>score(b)-score(a));
 }
 function matchSpecial(x){if(specialFilter==='confirmed')return x.euro&&!x.euro.includes('À vérifier');if(specialFilter==='human')return x.size.includes('PME')||x.hum>=4;return true;}
 function clearSpecialAndRender(){specialFilter='';renderTable();}
 function applyDashboardFilter(kind){document.getElementById('q').value='';document.getElementById('cat').value='';document.getElementById('stat').value='';document.getElementById('prio').value='';specialFilter='';if(kind==='A')document.getElementById('prio').value='A';if(kind==='confirmed')specialFilter='confirmed';if(kind==='human')specialFilter='human';show('prospects');renderTable();}
 function show(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',(t.getAttribute('onclick')||'').includes(`show('${id}')`)));if(id==='mapsec')setTimeout(initMap,150);if(id==='sync')renderSync();}
+
 function renderKpis(){
   const total=data.length,A=data.filter(x=>x.prio==='A').length,
         euro=data.map(prospect).filter(x=>x.euro&&!x.euro.includes('À vérifier')).length,
         pme=data.filter(x=>x.size.includes('PME')||x.hum>=4).length;
-  const kpis=[['Prospects V1',total,'all'],['Priorité A',A,'A'],['Présence salon confirmée',euro,'confirmed'],['PME ou taille humaine',pme,'human']];
+  const kpis=[['Prospects V3',total,'all'],['Priorité A',A,'A'],['Présence salon confirmée',euro,'confirmed'],['PME ou taille humaine',pme,'human']];
   document.getElementById('kpis').innerHTML=kpis.map(k=>`<button class="kpi" onclick="applyDashboardFilter('${k[2]}')"><div class=n>${k[1]}</div><div class=l>${k[0]}</div></button>`).join('');
   document.getElementById('topcards').innerHTML=filtered().slice(0,9).map(x=>card(x)).join('');
 }
 function card(x){return `<div class=card><h3>${esc(x.name)} <span class="pill ${x.prio}">${x.prio}</span></h3><div class=small>${esc(x.cat)} • ${esc(x.region)}</div><div class=row><span>Score</span><span class=score>${score(x)}</span></div><div class=row><span>Intérêt Axis</span><span>${esc(x.axis)}</span></div><div class=row><span>Eurosatory</span><span>${esc(x.euro)}</span></div></div>`;}
+
 function renderTable(){
   const cats=[...new Set(data.map(x=>x.cat))].sort();
   const catSel=document.getElementById('cat');
@@ -240,8 +266,9 @@ function renderTable(){
   const fi=document.getElementById('filterinfo');
   if(fi)fi.innerHTML=label?label+' <button class="btn2" onclick="clearSpecialAndRender()">Réinitialiser</button>':'';
   const statuts=['Suspect','Prospect','Contact établi','NDA signé','Consultation','Commande'];
-  const rows=filtered().map(x=>`<tr>
-    <td><b>${esc(x.name)}</b><br><span class=small>${esc(x.city)} • ${esc(x.region)}</span></td>
+  const rows=filtered().map(x=>`<tr class="${isVisited(x.name)?'visitedrow':''}">
+    <td class=checkcell><input type="checkbox" ${isVisited(x.name)?'checked':''} onchange="setVisited('${esc(x.name)}',this.checked)"></td>
+    <td><b>${esc(x.name)}</b><br><span class=small>${esc(x.city)} • ${esc(x.region)}</span><br><span class=linkbtn onclick="openNewsFor('${esc(x.name)}')">Voir actualités</span></td>
     <td>${esc(x.cat)}<br><span class=small>${esc(x.size)}</span></td>
     <td>${esc(x.axis)}</td>
     <td>${esc(x.gc)}</td>
@@ -251,12 +278,26 @@ function renderTable(){
     <td><a style="color:#7dd3fc" href="${esc(x.source)}" target="_blank" rel="noopener">source</a></td>
     <td><textarea rows=2 onchange="setEdit('${esc(x.name)}','note',this.value)">${esc(x.note)}</textarea></td>
   </tr>`).join('');
-  document.getElementById('table').innerHTML=`<table><thead><tr><th>Société</th><th>Catégorie</th><th>Intérêt Axis</th><th>Grand compte Défense</th><th>Priorité</th><th>Eurosatory / stand</th><th>Statut</th><th>Source</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>`;
-  renderEuro();renderKpis();
+  document.getElementById('table').innerHTML=`<table><thead><tr><th>Vu</th><th>Société</th><th>Catégorie</th><th>Intérêt Axis</th><th>Grand compte Défense</th><th>Priorité</th><th>Eurosatory / stand</th><th>Statut</th><th>Source</th><th>Notes visite</th></tr></thead><tbody>${rows}</tbody></table>`;
+  renderEuro();renderKpis();renderNews();
 }
+
 function renderEuro(){
   const rows=data.map(prospect).filter(x=>x.euro&&!x.euro.includes('À vérifier')).sort((a,b)=>score(b)-score(a)).map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.euro)}</td><td><span class="pill ${x.prio}">${x.prio}</span> ${score(x)}</td><td>${esc(x.axis)}</td><td>${esc(x.note)}</td></tr>`).join('');
   document.getElementById('eurotable').innerHTML=`<table><thead><tr><th>Société</th><th>Stand ou présence</th><th>Priorité</th><th>Objectif de visite</th><th>Notes</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function openNewsFor(name){show('newssec');const q=document.getElementById('newsq');if(q){q.value=name;renderNews();}}
+function renderNews(){
+  const q=document.getElementById('newsq')?.value.toLowerCase()||'',t=document.getElementById('newstype')?.value||'';
+  const rows=recentNews.filter(n=>(!q||Object.values(n).join(' ').toLowerCase().includes(q))&&(!t||n.type===t)).map(n=>`<tr><td><b>${esc(n.company)}</b><br><span class=small>${esc(n.type)} • ${esc(n.date)}</span></td><td>${esc(n.title)}</td><td class=news-summary>${esc(n.summary)}</td><td>${esc(n.source)}<br><a style="color:#7dd3fc" href="${esc(n.url)}" target="_blank" rel="noopener">lien source</a></td></tr>`).join('');
+  document.getElementById('newstable').innerHTML=`<table><thead><tr><th>Société</th><th>Évènement</th><th>Synthèse utilisable en rendez-vous</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function exportNewsCSV(){
+  const cols=['company','type','date','title','summary','source','url'];
+  const csv=[cols.join(';')].concat(recentNews.map(n=>cols.map(c=>`"${String(n[c]||'').replaceAll('"','""')}"`).join(';'))).join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='axis_defense_actualites.csv';a.click();
 }
 let mapDone=false;
 function initMap(){
@@ -271,7 +312,7 @@ function exportCSV(){
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='axis_defense_prospects.csv';a.click();
 }
-renderKpis();renderTable();renderEuro();
+renderKpis();renderTable();renderEuro();renderNews();
 </script>
 </body>
 </html>
